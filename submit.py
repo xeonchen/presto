@@ -1,3 +1,13 @@
+#
+# This script submits requests to webpagetest.org in order to compare
+# performance of web browsers in various conditions.
+# Use config.toml to define the parameters.
+# alexa-top-10000-global.txt is where the top domains are listed
+# The output of this script will be several csv files, one for each location
+# we have defined in the config. Once the checks are completed,
+# use process_results.py or some other script to fetch the results and process
+# them.
+#
 
 import pytoml
 import httplib
