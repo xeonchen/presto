@@ -81,7 +81,7 @@ function createRow(domain, firefoxId, chromeId, firstSpeedIndex, cacheSpeedIndex
 
     var td = document.createElement('td');
     var a = document.createElement('a');
-    a.innerText = domain;
+    a.appendChild(document.createTextNode(domain));
     a.href = "#";
     a.onclick = function() {
         makeplot(firefoxId, chromeId, domain);
@@ -92,24 +92,24 @@ function createRow(domain, firefoxId, chromeId, firstSpeedIndex, cacheSpeedIndex
 
     var td = document.createElement('td');
     var a = document.createElement('a');
-    a.innerText = firefoxId;
+    a.appendChild(document.createTextNode(firefoxId));
     a.href = "http://www.webpagetest.org/result/"+firefoxId+"/";
     td.appendChild(a);
     tr.appendChild(td);
 
     var td = document.createElement('td');
     var a = document.createElement('a');
-    a.innerText = chromeId;
+    a.appendChild(document.createTextNode(chromeId));
     a.href = "http://www.webpagetest.org/result/"+chromeId+"/";
     td.appendChild(a);
     tr.appendChild(td);
 
     var td = document.createElement('td');
-    td.innerText = firstSpeedIndex;
+    td.appendChild(document.createTextNode(firstSpeedIndex));
     tr.appendChild(td);
 
     var td = document.createElement('td');
-    td.innerText = cacheSpeedIndex;
+    td.appendChild(document.createTextNode(cacheSpeedIndex));
     tr.appendChild(td);
 
     return tr;
@@ -125,7 +125,7 @@ function computeTable(testData) {
     table.appendChild(tr);
 
     var td = document.createElement('td');
-    td.innerText = testData.name;
+    td.appendChild(document.createTextNode(testData.name));
     tr.appendChild(td);
 
     var td = document.createElement('td');

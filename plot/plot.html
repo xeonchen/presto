@@ -19,13 +19,8 @@
       <div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
 
       <select id="column">
-        <option value="Date"> Date </option>
-        <option value="Time"> Time </option>
-        <option value="Event Name"> Event Name </option>
-        <option value="URL"> URL </option>
         <option value="Load Time (ms)"> Load Time (ms) </option>
         <option value="Time to First Byte (ms)"> Time to First Byte (ms) </option>
-        <option value="unused"> unused </option>
         <option value="Bytes Out"> Bytes Out </option>
         <option value="Bytes In"> Bytes In </option>
         <option value="DNS Lookups"> DNS Lookups </option>
@@ -36,20 +31,11 @@
         <option value="Not Modified"> Not Modified </option>
         <option value="Not Found"> Not Found </option>
         <option value="Other Responses"> Other Responses </option>
-        <option value="Error Code"> Error Code </option>
         <option value="Time to Start Render (ms)"> Time to Start Render (ms) </option>
         <option value="Segments Transmitted"> Segments Transmitted </option>
         <option value="Segments Retransmitted"> Segments Retransmitted </option>
         <option value="Packet Loss (out)"> Packet Loss (out) </option>
         <option value="Activity Time(ms)"> Activity Time(ms) </option>
-        <option value="Descriptor"> Descriptor </option>
-        <option value="Lab ID"> Lab ID </option>
-        <option value="Dialer ID"> Dialer ID </option>
-        <option value="Connection Type"> Connection Type </option>
-        <option value="Cached"> Cached </option>
-        <option value="Event URL"> Event URL </option>
-        <option value="Pagetest Build"> Pagetest Build </option>
-        <option value="Measurement Type"> Measurement Type </option>
         <option value="Experimental"> Experimental </option>
         <option value="Doc Complete Time (ms)"> Doc Complete Time (ms) </option>
         <option value="Event GUID"> Event GUID </option>
@@ -75,8 +61,6 @@
         <option value="Not Found (Doc)"> Not Found (Doc) </option>
         <option value="Other Responses (Doc)"> Other Responses (Doc) </option>
         <option value="Compression Score"> Compression Score </option>
-        <option value="Host"> Host </option>
-        <option value="IP Address"> IP Address </option>
         <option value="ETag Score"> ETag Score </option>
         <option value="Flagged Requests"> Flagged Requests </option>
         <option value="Flagged Connections"> Flagged Connections </option>
@@ -90,25 +74,18 @@
         <option value="Image Total Bytes"> Image Total Bytes </option>
         <option value="Image Savings"> Image Savings </option>
         <option value="Base Page Redirects"> Base Page Redirects </option>
-        <option value="Optimization Checked"> Optimization Checked </option>
         <option value="AFT (ms)"> AFT (ms) </option>
         <option value="DOM Elements"> DOM Elements </option>
         <option value="PageSpeed Version"> PageSpeed Version </option>
-        <option value="Page Title"> Page Title </option>
         <option value="Time to Title"> Time to Title </option>
         <option value="Load Event Start"> Load Event Start </option>
         <option value="Load Event End"> Load Event End </option>
         <option value="DOM Content Ready Start"> DOM Content Ready Start </option>
         <option value="DOM Content Ready End"> DOM Content Ready End </option>
         <option value="Visually Complete (ms)"> Visually Complete (ms) </option>
-        <option value="Browser Name"> Browser Name </option>
-        <option value="Browser Version"> Browser Version </option>
         <option value="Base Page Server Count"> Base Page Server Count </option>
         <option value="Base Page Server RTT"> Base Page Server RTT </option>
-        <option value="Base Page CDN"> Base Page CDN </option>
-        <option value="Adult Site"> Adult Site </option>
         <option value="Run"> Run </option>
-        <option value="Cached"> Cached </option>
         <option value="Speed Index" selected="selected"> Speed Index </option>
       </select>
       <button onclick="makeplot(gFirefoxId, gChromeId, gTitle)"> Replot </button>
