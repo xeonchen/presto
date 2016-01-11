@@ -79,13 +79,11 @@ def main():
             try:
                 firstDiff = -firstDiff + response['data']['median']['firstView']['SpeedIndex']
             except:
-                firstValid = False
                 print "Can't find firstView median for index %d location %s" % (index, location)
 
             try:
                 secondDiff = -secondDiff + response['data']['median']['repeatView']['SpeedIndex']
             except:
-                secondValid = False
                 print "Can't find repeatView median for index %d location %s" % (index, location)
 
             if location.find(":C") != -1:
@@ -96,8 +94,7 @@ def main():
         entry['firstDiff'] = firstDiff
         entry['secondDiff'] = secondDiff
 
-        if firstValid and secondValid:
-            data.append(entry)
+        data.append(entry)
 
     content['data'] = data
     output.write('var testData = '+json.dumps(content)+';')

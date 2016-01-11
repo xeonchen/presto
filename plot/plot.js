@@ -92,14 +92,14 @@ function createRow(domain, firefoxId, chromeId, firstSpeedIndex, cacheSpeedIndex
 
     var td = document.createElement('td');
     var a = document.createElement('a');
-    a.appendChild(document.createTextNode("F"));
+    a.innerText = firefoxId;
     a.href = "http://www.webpagetest.org/result/"+firefoxId+"/";
     td.appendChild(a);
     tr.appendChild(td);
 
     var td = document.createElement('td');
     var a = document.createElement('a');
-    a.appendChild(document.createTextNode("C"));
+    a.innerText = chromeId;
     a.href = "http://www.webpagetest.org/result/"+chromeId+"/";
     td.appendChild(a);
     tr.appendChild(td);
