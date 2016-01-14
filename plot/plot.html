@@ -16,10 +16,13 @@
 <body>
 
   <div class="column">
+      Click domain to plot data points. <br/>
+      Click ^ to sort by column (<a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index"> Speed Index </a>).
       <div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
 
       <select id="column">
-        <option value="Load Time (ms)"> Load Time (ms) </option>
+        <option value="Load Time (ms)" selected="selected"> Load Time (ms) </option>
+        <option value="Speed Index"> Speed Index </option>
         <option value="Time to First Byte (ms)"> Time to First Byte (ms) </option>
         <option value="Bytes Out"> Bytes Out </option>
         <option value="Bytes In"> Bytes In </option>
@@ -36,7 +39,6 @@
         <option value="Segments Retransmitted"> Segments Retransmitted </option>
         <option value="Packet Loss (out)"> Packet Loss (out) </option>
         <option value="Activity Time(ms)"> Activity Time(ms) </option>
-        <option value="Experimental"> Experimental </option>
         <option value="Doc Complete Time (ms)"> Doc Complete Time (ms) </option>
         <option value="Event GUID"> Event GUID </option>
         <option value="Time to DOM Element (ms)"> Time to DOM Element (ms) </option>
@@ -85,8 +87,6 @@
         <option value="Visually Complete (ms)"> Visually Complete (ms) </option>
         <option value="Base Page Server Count"> Base Page Server Count </option>
         <option value="Base Page Server RTT"> Base Page Server RTT </option>
-        <option value="Run"> Run </option>
-        <option value="Speed Index" selected="selected"> Speed Index </option>
       </select>
       <button onclick="makeplot(gFirefoxId, gChromeId, gTitle)"> Replot </button>
   </div>

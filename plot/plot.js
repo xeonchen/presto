@@ -129,15 +129,16 @@ function computeTable(testData) {
     tr.appendChild(td);
 
     var td = document.createElement('td');
+    td.appendChild(document.createTextNode("Firefox run"));
     tr.appendChild(td);
 
     var td = document.createElement('td');
+    td.appendChild(document.createTextNode("Chrome run"));
     tr.appendChild(td);
 
     /////////////
 
     var td = document.createElement('td');
-
     var a = document.createElement('a');
     a.appendChild(document.createTextNode('^'));
     a.href = '#';
@@ -150,8 +151,7 @@ function computeTable(testData) {
         return false;
     }
     td.appendChild(a);
-
-    td.appendChild(document.createTextNode(' '));
+    td.appendChild(document.createTextNode(" SI firstRun"));
 
     tr.appendChild(td);
 
@@ -171,6 +171,7 @@ function computeTable(testData) {
         return false;
     }
     td.appendChild(a);
+    td.appendChild(document.createTextNode(" SI reload"));
 
     tr.appendChild(td);
 
