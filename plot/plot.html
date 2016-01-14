@@ -17,7 +17,10 @@
 
   <div class="column">
       Click domain to plot data points. <br/>
-      Click ^ to sort by column (<a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index"> Speed Index </a>).
+      Click ^ to sort by column. <br/>
+      The numbers are the difference between <br/>Chrome SI and Firefox SI on the median run.
+      (<a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index"> Speed Index </a>). <br/>
+      A positive difference means Firefox has a lower SI, <br/>therefore it is better on that load.
       <div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
 
       <select id="column">
