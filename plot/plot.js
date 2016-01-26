@@ -25,8 +25,8 @@ function displayDomain(domain) {
         requests = [];
         for (var i in tmp)
             if (tmp[i].connectivity == connectivity &&
-                (tmp[i].browser_name + " " + tmp[i].browser_version == browsers[0] ||
-                 tmp[i].browser_name + " " + tmp[i].browser_version == browsers[1]))
+                ((tmp[i].browser_name + " " + tmp[i].browser_version.substring(0,2)).startsWith(browsers[0]) ||
+                 (tmp[i].browser_name + " " + tmp[i].browser_version.substring(0,2)).startsWith(browsers[1])))
             requests.push(tmp[i]);
 
         for (var i in requests) {
@@ -37,7 +37,7 @@ function displayDomain(domain) {
         Promise.all(promises).then(function(results) {
             var plots = {};
             for (var i in results) {
-                processResult(plots, requests[i].id, results[i], requests[i].browser_name, requests[i].browser_version, requests[i].connectivity);
+                processResult(plots, requests[i].id, results[i], requests[i].browser_name, requests[i].browser_version.substring(0,2), requests[i].connectivity);
             }
 
             var plot_values = [];
