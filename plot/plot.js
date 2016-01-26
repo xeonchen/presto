@@ -3,56 +3,80 @@ var gFirefoxId = null;
 var gChromeId = null;
 var gTitle = null;
 
-function makeplot(firefoxId, chromeId, title) {
-    gPlots = [];
-    gFirefoxId = firefoxId;
-    gChromeId = chromeId;
-    gTitle = title;
-    d3.csv("http://www.webpagetest.org/result/"+firefoxId+"/page_data.csv", function(data){ processData(data, true, title) } );
-    d3.csv("http://www.webpagetest.org/result/"+chromeId+"/page_data.csv", function(data){ processData(data, false, title) } );
-};
+function getResultPromise(resultId) {
+    return new Promise(function(resolve, reject) {
+        d3.csv("http://www.webpagetest.org/result/"+resultId+"/page_data.csv", function(data) {
+            resolve(data);
+        });
+    });
+}
 
-function processData(allRows, isFirefox, title) {
-    var name = "Firefox run";
-    var cname = "Firefox cached";
-    var netColor = 'red';
-    var cacheColor = 'orange';
-    if (!isFirefox) {
-        name = "Chrome run";
-        cname = "Chrome cached"
-        netColor = 'blue';
-        cacheColor = 'cyan';
-    }
+function displayDomain(domain) {
+    gDomain = domain;
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function() {
+        var requests = JSON.parse(this.responseText);
+        var promises = [];
 
-    var net = { name: name, x: [], y: [], text: [], mode: 'markers', type: 'scatter', marker: { color: netColor }};
-    var cache = { name: cname, x: [], y: [], text: [], mode: 'markers', type: 'scatter', marker: { color: cacheColor }};
+        var browsers = document.getElementById('compare').value.split(",");
+        var connectivity = document.getElementById('connectivity').value;
 
-    var tableColumn = document.getElementById('column').value;
+        var tmp = requests;
+        requests = [];
+        for (var i in tmp)
+            if (tmp[i].connectivity == connectivity &&
+                (tmp[i].browser_name + " " + tmp[i].browser_version == browsers[0] ||
+                 tmp[i].browser_name + " " + tmp[i].browser_version == browsers[1]))
+            requests.push(tmp[i]);
 
-    for (var i = 0; i < allRows.length; i++) {
-        var row = allRows[i];
-
-        var y = row[tableColumn];
-        var x = row['Run'];
-        var cached = parseInt(row['Cached']);
-        var text = '';
-
-        if (!cached) {
-            net.x.push(x);
-            net.y.push(y);
-            // net.text.push(text);
-        } else {
-            cache.x.push(x);
-            cache.y.push(y);
-            // cache.text.push(text);
+        for (var i in requests) {
+            promises.push( getResultPromise(requests[i].id) );
+            console.log(requests[i]);
         }
 
-    }
+        Promise.all(promises).then(function(results) {
+            var plots = {};
+            for (var i in results) {
+                processResult(plots, requests[i].id, results[i], requests[i].browser_name, requests[i].browser_version, requests[i].connectivity);
+            }
 
-    gPlots.push(net);
-    gPlots.push(cache);
+            var plot_values = [];
+            for (var i in plots) {
+                plot_values.push(plots[i]);
+            }
+            displayPlot(plot_values, domain);
+        });
+    });
+    oReq.open("GET", "http://webpagetest.meteor.com/api/get/"+encodeURIComponent(domain));
+    oReq.send();
+}
 
+function displayPlot(plots, title) {
+
+    var sorted = document.getElementById('sorted').checked;
+    if (sorted)
+        for (var plotIndex in plots) {
+          var plot = plots[plotIndex];
+          for (var i = 0; i < plot.y.length; i++)
+            for (var j = i; j< plot.y.length; j++)
+              if (parseInt(plot.y[i]) > parseInt(plot.y[j])) {
+                var temp = plot.y[i];
+                plot.y[i] = plot.y[j];
+                plot.y[j] = temp;
+
+                temp = plot.info[i];
+                plot.info[i] = plot.info[j];
+                plot.info[j] = temp;
+              }
+          plot.x = [];
+          for (var i = 0; i < plot.y.length; i++) {
+            plot.x.push(i);
+          }
+        }
+
+    var tableColumn = document.getElementById('column').value;
     var layout = {
+      hovermode:'closest',
       title: title,
       xaxis: {
         title: 'run index',
@@ -68,127 +92,77 @@ function processData(allRows, isFirefox, title) {
       }
     };
 
-    if (gPlots.length == 4) {
-        console.log(gPlots);
-        Plotly.newPlot('myDiv', gPlots, layout);
+    Plotly.newPlot('myDiv', plots, layout);
+    var myPlot = document.getElementById('myDiv');
+    myPlot.on('plotly_click', function(data){
+        console.log(data);
+        var index = data.points[0].x;
+        window.open("http://www.webpagetest.org/result/" + data.points[0].data.info[index]);
+    });
+}
+
+function lazyGetPlot(plotTable, browser_name, browser_version, cached, connectivity) {
+  var id = browser_name + " " + browser_version + " " + (cached ? "repeatView" : "firstView") + " " + connectivity;
+  if (plotTable[id]) {
+    return plotTable[id];
+  }
+  plotTable[id] = { name: id, x: [], y: [], info: [], mode: 'markers', type: 'scatter' };
+  return plotTable[id];
+}
+
+function processResult(plots, testid, allRows, browser_name, browser_version, connectivity) {
+    var net = lazyGetPlot(plots, browser_name, browser_version, 0, connectivity);
+    var cache = lazyGetPlot(plots, browser_name, browser_version, 1, connectivity);
+
+    var tableColumn = document.getElementById('column').value;
+
+    var net_len = net.x.length - 1;
+    var cache_len = cache.x.length - 1;
+
+    for (var i = 0; i < allRows.length; i++) {
+        var row = allRows[i];
+
+        var y = row[tableColumn];
+        var x = parseInt(row['Run']);
+        var cached = parseInt(row['Cached']);
+        var text = testid+"/"+x+"/details" + (cached ? "/cached" : "");
+        console.log(text);
+
+        if (!cached) {
+            net.x.push(x+net_len);
+            net.y.push(y);
+            net.info.push(text);
+        } else {
+            cache.x.push(x+cache_len);
+            cache.y.push(y);
+            cache.info.push(text);
+        }
     }
 }
 
-// makeplot('160104_M4_Q6H','160104_32_Q6K', 'test');
-
-function createRow(domain, firefoxId, chromeId, firstSpeedIndex, cacheSpeedIndex) {
-    var tr = document.createElement('tr');
-
-    var td = document.createElement('td');
-    var a = document.createElement('a');
-    a.appendChild(document.createTextNode(domain));
-    a.href = "#";
-    a.onclick = function() {
-        makeplot(firefoxId, chromeId, domain);
-        return false;
-    }
-    td.appendChild(a);
-    tr.appendChild(td);
-
-    var td = document.createElement('td');
-    var a = document.createElement('a');
-    a.appendChild(document.createTextNode(firefoxId));
-    a.href = "http://www.webpagetest.org/result/"+firefoxId+"/";
-    td.appendChild(a);
-    tr.appendChild(td);
-
-    var td = document.createElement('td');
-    var a = document.createElement('a');
-    a.appendChild(document.createTextNode(chromeId));
-    a.href = "http://www.webpagetest.org/result/"+chromeId+"/";
-    td.appendChild(a);
-    tr.appendChild(td);
-
-    var td = document.createElement('td');
-    td.appendChild(document.createTextNode(firstSpeedIndex));
-    tr.appendChild(td);
-
-    var td = document.createElement('td');
-    td.appendChild(document.createTextNode(cacheSpeedIndex));
-    tr.appendChild(td);
-
-    return tr;
-}
-
-function computeTable(testData) {
-    var div = document.createElement('div');
-    div.classList.add('column');
-
-    var table = document.createElement('table');
-
-    var tr = document.createElement('tr');
-    table.appendChild(tr);
-
-    var td = document.createElement('td');
-    td.appendChild(document.createTextNode(testData.name));
-    tr.appendChild(td);
-
-    var td = document.createElement('td');
-    td.appendChild(document.createTextNode("Firefox run"));
-    tr.appendChild(td);
-
-    var td = document.createElement('td');
-    td.appendChild(document.createTextNode("Chrome run"));
-    tr.appendChild(td);
-
-    /////////////
-
-    var td = document.createElement('td');
-    var a = document.createElement('a');
-    a.appendChild(document.createTextNode('^'));
-    a.href = '#';
-    a.onclick = function() {
-        testData.data.sort(function(a,b) {
-            return a.firstDiff - b.firstDiff;
-        });
-        var newDiv = computeTable(testData);
-        document.body.replaceChild(newDiv, div);
-        return false;
-    }
-    td.appendChild(a);
-    td.appendChild(document.createTextNode(" SI firstRun"));
-
-    tr.appendChild(td);
-
-    /////////////
-
-    var td = document.createElement('td');
-
-    var a = document.createElement('a');
-    a.appendChild(document.createTextNode('^'));
-    a.href = '#';
-    a.onclick = function() {
-        testData.data.sort(function(a,b) {
-            return a.secondDiff - b.secondDiff;
-        });
-        var newDiv = computeTable(testData);
-        document.body.replaceChild(newDiv, div);
-        return false;
-    }
-    td.appendChild(a);
-    td.appendChild(document.createTextNode(" SI reload"));
-
-    tr.appendChild(td);
-
-    /////////////
-
-    for (var i = 0; i<testData.data.length; i++) {
-        var entry = testData.data[i];
-        table.appendChild(createRow(entry.domain, entry.firefoxId, entry.chromeId, entry.firstDiff, entry.secondDiff));
-    }
-
-    div.appendChild(table);
-    return div;
-}
+window.addEventListener("load", function() {
+    var oReq = new XMLHttpRequest();
+    oReq.addEventListener("load", function() {
+        var table = document.getElementById("domains");
+        var domains = JSON.parse(this.responseText);
+        for (var i in domains) {
+            var tr = document.createElement('tr');
+            var td = document.createElement('td');
+            var domain = domains[i];
+            td.onclick = function() {
+                displayDomain(this.textContent);
+                return false;
+            }
+            td.appendChild(document.createTextNode(domains[i]));
+            tr.appendChild(td);
+            table.appendChild(tr);
+        }
+    });
+    oReq.open("GET", "http://webpagetest.meteor.com/api/domains");
+    oReq.send();
+});
 
 function displayTable(testData) {
     var div = computeTable(testData);
     document.body.appendChild(div);
 }
-
-

@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Table</title>
+    <script src="http://d3js.org/d3.v3.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="plot.js"></script>
     <style type="text/css">
@@ -14,14 +16,10 @@
     </style>
 </head>
 <body>
-
   <div class="column">
-      Click domain to plot data points. <br/>
-      Click ^ to sort by column. <br/>
-      The numbers are the difference between <br/>Chrome SI and Firefox SI on the median run.
-      (<a href="https://sites.google.com/a/webpagetest.org/docs/using-webpagetest/metrics/speed-index"> Speed Index </a>). <br/>
-      A positive difference means Firefox has a lower SI, <br/>therefore it is better on that load.
-      <div id="myDiv" style="width: 480px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
+      Click on a domain do display runs. <br/>
+      Click on a point to open run in a new window.
+      <div id="myDiv" style="width: 800px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
 
       <select id="column">
         <option value="Load Time (ms)" selected="selected"> Load Time (ms) </option>
@@ -91,13 +89,26 @@
         <option value="Base Page Server Count"> Base Page Server Count </option>
         <option value="Base Page Server RTT"> Base Page Server RTT </option>
       </select>
-      <button onclick="makeplot(gFirefoxId, gChromeId, gTitle)"> Replot </button>
+      <button onclick="displayDomain(gDomain)"> Replot </button>
+      <input type="checkbox" id="sorted"> Sorted <br>
+      <select id="compare">
+        <option value="Firefox 43.0.0.5820,Google Chrome 47.0.2526.106" selected="selected"> Firefox 43 - Chrome 47 </option>
+        <option value="Nightly 44.0.0.5771,Google Chrome 49.0.2614.4"> Firefox 44 - Chrome 49 </option>
+      </select>
+      <select id="connectivity">
+        <option value="Cable" selected="selected"> Cable </option>
+        <option value="3G"> 3G </option>
+        <option value="Dial"> Dial </option>
+      </select>
   </div>
 
-  <script src="1-100.js"></script>
+  <table id="domains">
+  </table>
+
+  <!-- <script src="1-100.js"></script>
   <script src="bis.js"></script>
   <script src="nightly.js"></script>
   <script src="3G.js"></script>
-  <script src="dial.js"></script>
+  <script src="dial.js"></script> -->
 </body>
 </html>
