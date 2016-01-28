@@ -90,16 +90,23 @@
         <option value="Base Page Server RTT"> Base Page Server RTT </option>
       </select>
       <button onclick="displayDomain(gDomain)"> Replot </button>
-      <input type="checkbox" id="sorted"> Sorted <br>
-      <select id="compare">
-        <option value="Firefox 43,Google Chrome 47" selected="selected"> Firefox 43 - Chrome 47 </option>
-        <option value="Nightly 44,Google Chrome 49"> Firefox 44 - Chrome 49 </option>
-      </select>
+      <input type="checkbox" id="sorted" checked> Sorted
+      <input type="checkbox" id="cached" checked> Display Repeat View
+
       <select id="connectivity">
         <option value="Cable" selected="selected"> Cable </option>
         <option value="3G"> 3G </option>
         <option value="Dial"> Dial </option>
       </select>
+
+      <br>
+
+      <input type="checkbox" name="browser" value="Firefox 43" checked> Firefox 43 <br>
+      <input type="checkbox" name="browser" value="Google Chrome 47" checked> Chrome 47 <br>
+      <input type="checkbox" name="browser" value="Nightly 44"> Nightly 44 <br>
+      <input type="checkbox" name="browser" value="Google Chrome 49"> Chrome 49 <br>
+
+      
   </div>
 
   <table id="domains">

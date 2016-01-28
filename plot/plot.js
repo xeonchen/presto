@@ -18,20 +18,20 @@ function displayDomain(domain) {
         var requests = JSON.parse(this.responseText);
         var promises = [];
 
-        var browsers = document.getElementById('compare').value.split(",");
+        var browsers = document.getElementsByName('browser');
         var connectivity = document.getElementById('connectivity').value;
 
         var tmp = requests;
         requests = [];
         for (var i in tmp)
-            if (tmp[i].connectivity == connectivity &&
-                ((tmp[i].browser_name + " " + tmp[i].browser_version.substring(0,2)).startsWith(browsers[0]) ||
-                 (tmp[i].browser_name + " " + tmp[i].browser_version.substring(0,2)).startsWith(browsers[1])))
-            requests.push(tmp[i]);
+            if (tmp[i].connectivity == connectivity)
+                for (var j in browsers) {
+                    if (browsers[j].checked && (tmp[i].browser_name + " " + tmp[i].browser_version.substring(0,2)).startsWith(browsers[j].value))
+                        requests.push(tmp[i]);
+                }
 
         for (var i in requests) {
             promises.push( getResultPromise(requests[i].id) );
-            console.log(requests[i]);
         }
 
         Promise.all(promises).then(function(results) {
@@ -40,8 +40,12 @@ function displayDomain(domain) {
                 processResult(plots, requests[i].id, results[i], requests[i].browser_name, requests[i].browser_version.substring(0,2), requests[i].connectivity);
             }
 
+            var cached = document.getElementById('cached').checked;
             var plot_values = [];
             for (var i in plots) {
+                if (!cached && plots[i].cached)
+                    continue;
+                console.log(cached+" "+plots[i].cached);
                 plot_values.push(plots[i]);
             }
             displayPlot(plot_values, domain);
@@ -95,18 +99,23 @@ function displayPlot(plots, title) {
     Plotly.newPlot('myDiv', plots, layout);
     var myPlot = document.getElementById('myDiv');
     myPlot.on('plotly_click', function(data){
-        console.log(data);
         var index = data.points[0].x;
         window.open("http://www.webpagetest.org/result/" + data.points[0].data.info[index]);
     });
 }
 
 function lazyGetPlot(plotTable, browser_name, browser_version, cached, connectivity) {
+  var colors = { 'Firefox': 'red', 'Google Chrome': 'gray', 'Nightly': 'blue'};
+  var color = (cached ? 'light' : '') + colors[browser_name];
+
   var id = browser_name + " " + browser_version + " " + (cached ? "repeatView" : "firstView") + " " + connectivity;
   if (plotTable[id]) {
     return plotTable[id];
   }
-  plotTable[id] = { name: id, x: [], y: [], info: [], mode: 'markers', type: 'scatter' };
+
+  var sorted = document.getElementById('sorted').checked;
+  var mode = (sorted ? "lines+" : "") + "markers";
+  plotTable[id] = { name: id, x: [], y: [], info: [], mode: mode, type: 'scatter',  marker: { color: color }, cached: cached };
   return plotTable[id];
 }
 
@@ -126,8 +135,7 @@ function processResult(plots, testid, allRows, browser_name, browser_version, co
         var x = parseInt(row['Run']);
         var cached = parseInt(row['Cached']);
         var text = testid+"/"+x+"/details" + (cached ? "/cached" : "");
-        console.log(text);
-
+        
         if (!cached) {
             net.x.push(x+net_len);
             net.y.push(y);
@@ -153,12 +161,16 @@ window.addEventListener("load", function() {
                 displayDomain(this.textContent);
                 return false;
             }
-            td.appendChild(document.createTextNode(domains[i]));
+            var a = document.createElement('a');
+            a.href = "#";
+            a.textContent = domains[i];
+            td.appendChild(a);
             tr.appendChild(td);
             table.appendChild(tr);
         }
     });
-    oReq.open("GET", "http://webpagetest.meteor.com/api/domains");
+    //oReq.open("GET", "http://webpagetest.meteor.com/api/domains");
+    oReq.open("GET", "top100.json");
     oReq.send();
 });
 
