@@ -41,6 +41,9 @@ function displayDomain(domain) {
             }
 
             var cached = document.getElementById('cached').checked;
+            var stats = document.getElementById("stats");
+            stats.textContent = "";
+
             var plot_values = [];
             for (var i in plots) {
                 if (!cached && plots[i].cached)
@@ -55,28 +58,88 @@ function displayDomain(domain) {
     oReq.send();
 }
 
+function displayStatLine(content) {
+    var stats = document.getElementById("stats");
+    stats.appendChild(document.createTextNode(content));
+    stats.appendChild(document.createElement("br"));
+}
+
 function displayPlot(plots, title) {
-
     var sorted = document.getElementById('sorted').checked;
-    if (sorted)
-        for (var plotIndex in plots) {
-          var plot = plots[plotIndex];
-          for (var i = 0; i < plot.y.length; i++)
-            for (var j = i; j< plot.y.length; j++)
-              if (parseInt(plot.y[i]) > parseInt(plot.y[j])) {
-                var temp = plot.y[i];
-                plot.y[i] = plot.y[j];
-                plot.y[j] = temp;
+    var unsorted = JSON.parse(JSON.stringify(plots));
 
-                temp = plot.info[i];
-                plot.info[i] = plot.info[j];
-                plot.info[j] = temp;
-              }
-          plot.x = [];
-          for (var i = 0; i < plot.y.length; i++) {
-            plot.x.push(i);
+    for (var plotIndex in plots) {
+      var plot = plots[plotIndex];
+      for (var i = 0; i < plot.y.length; i++)
+        for (var j = i; j< plot.y.length; j++)
+          if (parseInt(plot.y[i]) > parseInt(plot.y[j])) {
+            var temp = plot.y[i];
+            plot.y[i] = plot.y[j];
+            plot.y[j] = temp;
+
+            temp = plot.info[i];
+            plot.info[i] = plot.info[j];
+            plot.info[j] = temp;
           }
-        }
+      plot.x = [];
+      for (var i = 0; i < plot.y.length; i++) {
+        plot.x.push(i);
+      }
+    }
+
+    // Compute stats
+
+    var avgFirstDiff = 0;
+    var avgRepeatDiff = 0;
+
+    var firstViewPlots = [];
+    var repeatViewPlots = [];
+
+    var countFirstBetter = 0;
+    var countRepeatBetter = 0;
+
+    for (var plotIndex in plots) {
+        if (plots[plotIndex].cached)
+            repeatViewPlots.push(plots[plotIndex]);
+        else
+            firstViewPlots.push(plots[plotIndex]);
+    }
+
+    var count = 0;
+    for (var i=0;i<firstViewPlots[0].y.length;i++)
+        if (firstViewPlots[0].y[i] && firstViewPlots[1].y[i])
+    {
+        count++;
+        avgFirstDiff += firstViewPlots[0].y[i] - firstViewPlots[1].y[i];
+        if (parseInt(firstViewPlots[0].y[i]) < parseInt(firstViewPlots[1].y[i]))
+            countFirstBetter++;
+    }
+
+    avgFirstDiff = avgFirstDiff/count;
+
+    displayStatLine("Average first diff: " + avgFirstDiff.toFixed(2));
+    displayStatLine("Count first better: "+countFirstBetter+" / "+count);
+
+    count = 0;
+    for (var i=0;i<repeatViewPlots[0].y.length;i++)
+        if (repeatViewPlots[0].y[i] && repeatViewPlots[1].y[i])
+    {
+        count++;
+        avgRepeatDiff += repeatViewPlots[0].y[i] - repeatViewPlots[1].y[i];
+        if (parseInt(repeatViewPlots[0].y[i]) < parseInt(repeatViewPlots[1].y[i]))
+            countRepeatBetter++;
+    }
+
+    avgRepeatDiff = avgRepeatDiff/count;
+
+    displayStatLine("Average repeat diff: " + avgRepeatDiff.toFixed(2));
+    displayStatLine("Count repeat better: "+countRepeatBetter+" / "+count);
+
+    //
+
+    if (!sorted) {
+        plots = unsorted;
+    }
 
     var tableColumn = document.getElementById('column').value;
     var layout = {

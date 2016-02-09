@@ -17,8 +17,15 @@
 </head>
 <body>
   <div class="column">
+      <div>
       Click on a domain do display runs. <br/>
       Click on a point to open run in a new window.
+      </div>
+      <br/>
+      Stats:
+      <div id="stats">
+      </div>
+
       <div id="myDiv" style="width: 800px; height: 400px;"><!-- Plotly chart will be drawn inside this DIV --></div>
 
       <select id="column">
@@ -101,12 +108,12 @@
 
       <br>
 
-      <input type="checkbox" name="browser" value="Firefox 43" checked> Firefox 43 <br>
-      <input type="checkbox" name="browser" value="Google Chrome 47" checked> Chrome 47 <br>
+      <input type="checkbox" name="browser" value="Firefox 43"> Firefox 43 <br>
+      <input type="checkbox" name="browser" value="Firefox 44" checked> Firefox 44 <br>
+      <input type="checkbox" name="browser" value="Google Chrome 47"> Chrome 47 <br>
+      <input type="checkbox" name="browser" value="Google Chrome 48" checked> Chrome 48 <br>
       <input type="checkbox" name="browser" value="Nightly 44"> Nightly 44 <br>
       <input type="checkbox" name="browser" value="Google Chrome 49"> Chrome 49 <br>
-
-      
   </div>
 
   <table id="domains">
