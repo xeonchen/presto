@@ -1,3 +1,4 @@
+#!/usr/bin/env python2.7
 #
 # This script submits requests to webpagetest.org in order to compare
 # performance of web browsers in various conditions.
@@ -9,11 +10,13 @@
 # them.
 #
 
-import pytoml
+import toml as pytoml
 import httplib
 import urllib
 import json
 import os.path
+import sys
+from datetime import datetime, date, time
 
 def parse_config():
     with open('config.toml', 'rb') as fin:
@@ -28,21 +31,24 @@ def parse_config():
 
 def parse_domains():
     tests = []
-    with open('alexa-top-10000-global.txt', 'r') as fin:
+    with open('top100.txt', 'r') as fin:
         tests = [x.strip('\n') for x in fin.readlines()]
     return tests
 
-def log_response_id(location, index, domain, test_id, owner_key):
-    filename = location+"_tests.csv"
+def log_response_id(files, location, index, domain, test_id, owner_key):
     f = None
-    if not os.path.exists(filename):
-        f = open(filename, 'w')
-    else:
-        f = open(filename, 'a+')
-        f.seek(0, 2) # go to end
+    if not location in files:
+        filename = location+"_"+datetime.now().strftime("%m-%d-%H%M")+".csv"
+        if not os.path.exists(filename):
+            f = open(filename, 'w')
+        else:
+            f = open(filename, 'a+')
+            f.seek(0, 2) # go to end
 
+        files[location] = f
+    else:
+        f = files[location]
     f.write(str(index) + ", "+ domain + ", " + test_id + ", " + owner_key + "\n")
-    f.close()
 
 
 def main():
@@ -52,14 +58,47 @@ def main():
     tests = parse_domains()
     results = {}
 
+    files = {}
+
     for i in range(config['start'], config['end']):
         for location in config['locations']:
-            params = urllib.urlencode({'k': config['key'], 'location': location, 'url': tests[i], 'f': 'json', 'runs': 10})
+            params = urllib.urlencode({'k': config['key'], 'location': location, 'url': tests[i], 'f': 'json', 'runs': 10, 'pingback': config['pingback']})
             f = urllib.urlopen("http://www.webpagetest.org/runtest.php", params)
             response = json.loads(f.read())
-            log_response_id(location, i, tests[i], response['data']['testId'], response['data']['ownerKey'])
+            log_response_id(files, location, i, tests[i], response['data']['testId'], response['data']['ownerKey'])
             print response
 
+    for key in files:
+        files[key].close()
+
+def submit_one():
+    config = parse_config()
+    # domain, location, output
+    domain = sys.argv[1]
+    location = sys.argv[2]
+    output = sys.argv[3]
+    files = {}
+
+    if not os.path.exists(output):
+        f = open(output, 'w')
+    else:
+        f = open(output, 'a+')
+        f.seek(0, 2) # go to end
+
+    files[location] = f
+
+    params = urllib.urlencode({'k': config['key'], 'location': location, 'url': domain, 'f': 'json', 'runs': 10, 'pingback': config['pingback']})
+    f = urllib.urlopen("http://www.webpagetest.org/runtest.php", params)
+    response = json.loads(f.read())
+    log_response_id(files, location, 0, domain, response['data']['testId'], response['data']['ownerKey'])
+    print response
+
+    for key in files:
+        files[key].close()
+
 if __name__ == '__main__':
-	main()
+    if len(sys.argv) == 1:
+        main()
+    else:
+        submit_one()
 
