@@ -1,0 +1,15 @@
+
+# The API key fo webpagetest.org
+# Try not to push it to github :)
+key = "_API_KEY_"
+
+# The start and end index of the domains we're testing
+start = 0
+end = 100
+
+# Use http://www.webpagetest.org/getLocations.php?f=xml to hunt for locations and UAs
+locations = ['Dulles:Firefox', 'Dulles:Chrome']
+
+label = "test1"
+endpoint = "https://www.webpagetest.org/runtest.php"
+pingback = "http://presto-wpt.herokuapp.com/api/addDomain"
