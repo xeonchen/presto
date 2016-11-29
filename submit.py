@@ -10,6 +10,9 @@
 # them.
 #
 
+# TODO: use https://github.com/marcelduran/webpagetest-api
+# as a better command line replacement.
+
 import toml as pytoml
 import httplib
 import urllib
@@ -62,11 +65,14 @@ def main():
 
     for i in range(config['start'], config['end']):
         for location in config['locations']:
-            params = urllib.urlencode({'k': config['key'], 'location': location, 'url': tests[i], 'f': 'json', 'runs': 10, 'pingback': config['pingback']})
-            f = urllib.urlopen("http://www.webpagetest.org/runtest.php", params)
+            if len(config['label'])>0:
+                params = urllib.urlencode({'k': config['key'], 'location': location, 'url': tests[i], 'f': 'json', 'runs': 10, 'pingback': config['pingback'], 'label': config['label']})
+            else:
+                params = urllib.urlencode({'k': config['key'], 'location': location, 'url': tests[i], 'f': 'json', 'runs': 10, 'pingback': config['pingback']})
+            f = urllib.urlopen(config['endpoint'], params)
             response = json.loads(f.read())
-            log_response_id(files, location, i, tests[i], response['data']['testId'], response['data']['ownerKey'])
             print response
+            log_response_id(files, location, i, tests[i], response['data']['testId'], response['data']['ownerKey'])
 
     for key in files:
         files[key].close()
@@ -87,8 +93,11 @@ def submit_one():
 
     files[location] = f
 
-    params = urllib.urlencode({'k': config['key'], 'location': location, 'url': domain, 'f': 'json', 'runs': 10, 'pingback': config['pingback']})
-    f = urllib.urlopen("http://www.webpagetest.org/runtest.php", params)
+    if len(config['label'])>0:
+        params = urllib.urlencode({'k': config['key'], 'location': location, 'url': domain, 'f': 'json', 'runs': 10, 'pingback': config['pingback'], 'label': config['label']})
+    else:
+        params = urllib.urlencode({'k': config['key'], 'location': location, 'url': domain, 'f': 'json', 'runs': 10, 'pingback': config['pingback']})
+    f = urllib.urlopen(config['endpoint'], params)
     response = json.loads(f.read())
     log_response_id(files, location, 0, domain, response['data']['testId'], response['data']['ownerKey'])
     print response

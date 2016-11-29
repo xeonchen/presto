@@ -10,6 +10,6 @@ end = 100
 # Use http://www.webpagetest.org/getLocations.php?f=xml to hunt for locations and UAs
 locations = ['Dulles:Firefox', 'Dulles:Chrome']
 
-label = "test1"
+label = ""
 endpoint = "https://www.webpagetest.org/runtest.php"
 pingback = "http://presto-wpt.herokuapp.com/api/addDomain"
