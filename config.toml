@@ -1,11 +1,14 @@
-
 # The API key fo webpagetest.org
 # Try not to push it to github :)
-key = "XXX"
+#key = "_API_KEY_"
 
 # The start and end index of the domains we're testing
 start = 0
 end = 100
 
 # Use http://www.webpagetest.org/getLocations.php?f=xml to hunt for locations and UAs
-locations = ['Dulles:Firefox', 'Dulles:Chrome']
+locations = ['Necko:Gecko', 'Necko:Firefox-Nightly', 'Necko:Chrome']
+
+label = ""
+endpoint = "http://wpt.xeon.tw/runtest.php"
+pingback = "http://presto.xeon.tw/api/addDomain"
