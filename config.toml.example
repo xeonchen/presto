@@ -6,6 +6,12 @@ key = "_API_KEY_"
 start = 0
 end = 100
 
+# Number of Tests to Run (up to 100)
+runs = 9
+
+# Task priority (0 to 9, highest: 0, lowest: 9, default: 5)
+priority = 5
+
 # Use http://www.webpagetest.org/getLocations.php?f=xml to hunt for locations and UAs
 locations = ['Dulles:Firefox', 'Dulles:Chrome']
 
