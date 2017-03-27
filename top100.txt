@@ -33,8 +33,8 @@ https://trello.com/b/gHooNW9I/ue4-roadmap
 https://bugzilla.mozilla.org/show_bug.cgi?id=448604
 https://treeherder.mozilla.org/#/jobs?repo=try
 https://github.com/servo/servo
-http://www.msn.com/
-https://www.yahoo.com/
+http://www.msn.com/en-us
+https://us.yahoo.com/
 https://login.yahoo.com/
 http://www.espn.com/nba/schedule
 http://www.espn.com/blog/nflnation/post/_/id/231479/franchise-tag-after-25-years-looking-back-at-best-worst-decisions
