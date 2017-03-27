@@ -39,7 +39,7 @@ def log_response_id(location, index, domain, test_id, owner_key):
     line = '%s, %s, %s, %s\n' % (index, domain, test_id, owner_key)
     f.write(line)
 
-def get_param(location, url):
+def get_param(location, url, label=None):
     params = {
         'f': 'json',
         'location': location,
@@ -50,9 +50,8 @@ def get_param(location, url):
     }
     if config.get('key'):
         params['k'] = config['key']
-
-    if config.get('label'):
-        params['label'] = config['label']
+    if label:
+        params['label'] = label
 
     return urllib.urlencode(params)
 
@@ -60,10 +59,14 @@ def submit_all():
     tests = parse_domains()
 
     for i in range(config['start'], config['end']):
-        for location in config['locations']:
-            submit_one(tests[i], location, i)
+        for j, location in enumerate(config['locations']):
+            try:
+                label = config['labels'][j]
+            except:
+                label = None
+            submit_one(tests[i], location, label, i)
 
-def submit_one(domain, location, index=0, output=None):
+def submit_one(domain, location, label=None, index=0, output=None):
     if location not in logs:
         if output is None:
             output = '%s_%s.csv' % (location, datetime.now().strftime("%m-%d-%H%M"))
@@ -76,13 +79,13 @@ def submit_one(domain, location, index=0, output=None):
 
         logs[location] = f
 
-    param = get_param(location, domain)
+    param = get_param(location, domain, label)
     print param
     f = urllib.urlopen(config['endpoint'], param)
     response = json.loads(f.read())
     print response
     if response['statusCode'] == 200:
-        log_response_id(location, 0, domain, response['data']['testId'], response['data']['ownerKey'])
+        log_response_id(location, index, domain, response['data']['testId'], response['data']['ownerKey'])
 
 def main(args):
     global logs

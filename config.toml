@@ -15,6 +15,6 @@ priority = 5
 # Use http://www.webpagetest.org/getLocations.php?f=xml to hunt for locations and UAs
 locations = ['Necko:Gecko', 'Necko:Firefox-Nightly', 'Necko:Chrome']
 
-label = ""
+labels = []
 endpoint = "http://wpt.xeon.tw/runtest.php"
 pingback = "http://presto.xeon.tw/api/addDomain"
