@@ -43,13 +43,14 @@ def get_param(location, url, label=None):
     params = {
         'f': 'json',
         'location': location,
-        'pingback': config['pingback'],
         'priority' : config.get('priority', '5'),
         'runs': config['runs'],
         'url': url
     }
     if config.get('key'):
         params['k'] = config['key']
+    if config.get('pingback'):
+        params['pingback'] = config['pingback']
     if label:
         params['label'] = label
 
