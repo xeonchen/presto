@@ -21,10 +21,10 @@ import os.path
 import sys
 from datetime import datetime
 
-def parse_config():
+def parse_config(path='config.toml'):
     global config
 
-    with open('config.toml', 'rb') as fin:
+    with open(path, 'rb') as fin:
         obj = pytoml.load(fin)
 
     config = { 'start': 0, 'end': 10000 }
@@ -51,6 +51,8 @@ def get_param(location, url, label=None):
         params['k'] = config['key']
     if config.get('pingback'):
         params['pingback'] = config['pingback']
+    if config.get('script'):
+        params['script'] = config['script'];
     if label:
         params['label'] = label
 
@@ -92,12 +94,13 @@ def main(args):
     global logs
     logs = {}
 
-    parse_config()
-
     if len(args) == 1:
+        parse_config()
         submit_all()
-    elif len(args) == 4:
-        submit_one(args[1], args[2], args[3])
+    else:
+        for path in args[1:]:
+            parse_config(path)
+            submit_all()
 
     for f in logs.itervalues():
         f.close()
