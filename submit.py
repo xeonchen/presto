@@ -21,17 +21,22 @@ import os.path
 import sys
 from datetime import datetime
 
-def parse_config(path='config.toml'):
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+ETC_DIR = os.path.join(BASE_DIR, 'etc')
+
+def parse_config(name):
     global config
 
+    path = os.path.join(ETC_DIR, name + '.toml')
     with open(path, 'rb') as fin:
         obj = pytoml.load(fin)
 
     config = { 'start': 0, 'end': 10000 }
     config.update(obj)
 
-def parse_domains():
-    with open('top100.txt', 'r') as fin:
+def parse_domains(path):
+    path = os.path.join(ETC_DIR, path)
+    with open(path, 'r') as fin:
         return [x.strip('\n') for x in fin.readlines()]
 
 def log_response_id(location, index, domain, test_id, owner_key):
@@ -41,7 +46,11 @@ def log_response_id(location, index, domain, test_id, owner_key):
 
 def get_param(location, url, label=None):
     params = {
+        'browser_width': config.get('browser_width', 1600),
+        'browser_height': config.get('browser_height', 900),
         'f': 'json',
+        'fvonly': config.get('fvonly', 0),
+        'ignoreSSL': config.get('ignoreSSL', 0),
         'location': location,
         'priority' : config.get('priority', '5'),
         'runs': config['runs'],
@@ -59,7 +68,7 @@ def get_param(location, url, label=None):
     return urllib.urlencode(params)
 
 def submit_all():
-    tests = parse_domains()
+    tests = parse_domains(config['domains'])
 
     for i in range(config['start'], config['end']):
         for j, location in enumerate(config['locations']):
@@ -72,7 +81,7 @@ def submit_all():
 def submit_one(domain, location, label=None, index=0, output=None):
     if location not in logs:
         if output is None:
-            output = '%s_%s.csv' % (location, datetime.now().strftime("%m-%d-%H%M"))
+            output = 'csv/%s_%s.csv' % (location, datetime.now().strftime("%m-%d-%H%M"))
 
         if not os.path.exists(output):
             f = open(output, 'w')
@@ -83,7 +92,7 @@ def submit_one(domain, location, label=None, index=0, output=None):
         logs[location] = f
 
     param = get_param(location, domain, label)
-    print param
+    #print param
     f = urllib.urlopen(config['endpoint'], param)
     response = json.loads(f.read())
     print response
@@ -95,11 +104,11 @@ def main(args):
     logs = {}
 
     if len(args) == 1:
-        parse_config()
+        parse_config('config')
         submit_all()
     else:
-        for path in args[1:]:
-            parse_config(path)
+        for name in args[1:]:
+            parse_config(name)
             submit_all()
 
     for f in logs.itervalues():

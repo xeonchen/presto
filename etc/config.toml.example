@@ -1,6 +1,9 @@
 # The API key fo webpagetest.org
 # Try not to push it to github :)
-key = "_API_KEY_"
+#key = "_API_KEY_"
+
+# domain list
+domains = "top100.txt"
 
 # The start and end index of the domains we're testing
 start = 0
