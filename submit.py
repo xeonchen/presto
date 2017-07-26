@@ -54,7 +54,8 @@ def get_param(location, url, label=None):
         'location': location,
         'priority' : config.get('priority', '5'),
         'runs': config['runs'],
-        'url': url
+        'url': url,
+        'video': config.get('video', 0)
     }
     if config.get('key'):
         params['k'] = config['key']
