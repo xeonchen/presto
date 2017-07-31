@@ -1,4 +1,5 @@
 #!/usr/bin/env python2.7
+# -*- coding: utf-8 -*-
 #
 # This script submits requests to webpagetest.org in order to compare
 # performance of web browsers in various conditions.
@@ -104,11 +105,11 @@ def main(args):
     global logs
     logs = {}
 
-    if len(args) == 1:
+    if len(args) == 0:
         parse_config('config')
         submit_all()
     else:
-        for name in args[1:]:
+        for name in args:
             parse_config(name)
             submit_all()
 
@@ -116,5 +117,5 @@ def main(args):
         f.close()
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main(sys.argv[1:])
 
